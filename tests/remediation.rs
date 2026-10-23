@@ -37,13 +37,13 @@ fn the_fixed_version_itself_and_anything_newer_on_the_branch_is_patched() {
 
 #[test]
 fn eol_branches_have_no_tracked_binary_fix_and_are_named_separately_from_exposed() {
-    // 7.4, 8.0, 8.1 only got source-only backports per the advisory; this tool
-    // does not report a binary fixed version for them.
+    // 7.4, 8.0, 8.1 are end-of-life with no vendor fix; this tool names them
+    // separately rather than inventing a fixed version.
     for observed in ["7.4.33", "8.0.30", "8.1.29"] {
         let v = parse_php_version(observed).unwrap();
         assert_eq!(
             classify_exposure(&v),
-            Exposure::EolBranchSourceBackportOnly,
+            Exposure::EolNoVendorFix,
             "observed {observed}"
         );
     }
@@ -110,13 +110,13 @@ fn an_exposed_branch_with_no_repo_fix_builds_from_source() {
 }
 
 #[test]
-fn an_eol_branch_builds_from_the_source_backport() {
+fn an_eol_branch_migrates_off_the_branch() {
     let exposure = classify_exposure(&parse_php_version("8.1.29").unwrap());
-    // The repo state is irrelevant for an EOL branch: there is no point release.
+    // The repo state is irrelevant for an EOL branch: there is no vendor fix.
     for repo in [PackageRepoFix::Available, PackageRepoFix::Absent] {
         assert_eq!(
             plan_remediation(exposure, repo),
-            RemediationPlan::BuildFromSourceBackport
+            RemediationPlan::MigrateOffEolBranch
         );
     }
 }

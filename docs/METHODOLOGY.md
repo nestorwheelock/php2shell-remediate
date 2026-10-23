@@ -114,9 +114,9 @@ the platform's package channel actually offers:
   stability package branch still served the vulnerable release while the
   rolling branch already carried the fix), either move to the channel that has
   the fix or build the fixed release from source.
-- End-of-life branches that received only a source backport are rebuilt from
-  that source; the tool refuses to name a binary "fixed version" it cannot
-  stand behind.
+- End-of-life branches have no vendor fix at all; the tool refuses to name a
+  "fixed version" it cannot stand behind, and the remedy there is migrating to a
+  supported branch.
 
 The patch is applied to the **sandbox clone first**, never to production
 directly, so a bad patch run cannot take a live site down.

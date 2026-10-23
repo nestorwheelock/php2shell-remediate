@@ -100,9 +100,9 @@ proof-of-concept and its guardrails: [examples/benevolent-poc/](examples/benevol
 | 8.3    | 8.3.36   |
 | 8.2    | 8.2.35   |
 
-7.4 / 8.0 / 8.1 are end-of-life and received source-only backports, not a vendor
-binary release; the tool reports those separately rather than naming a fixed
-version it cannot vouch for. A branch the advisory does not name is reported as
+7.4 / 8.0 / 8.1 are end-of-life and receive no official vendor fix; the tool
+reports those separately rather than inventing a fixed version, and the only
+remedy there is migrating to a supported branch. A branch the advisory does not name is reported as
 `UNKNOWN-BRANCH`, never guessed into patched or exposed.
 
 ## Usage

@@ -58,8 +58,8 @@ fn run_classify(raw: &str) -> i32 {
             println!("EXPOSED {parsed} — fixed in {fixed_in}");
             1
         }
-        Exposure::EolBranchSourceBackportOnly => {
-            println!("EOL-BRANCH {parsed} — source-only backport, no vendor point release");
+        Exposure::EolNoVendorFix => {
+            println!("EOL-BRANCH {parsed} — end-of-life, no vendor fix; migrate to a supported branch");
             1
         }
         Exposure::UnknownBranch => {

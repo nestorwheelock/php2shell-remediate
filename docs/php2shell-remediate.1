@@ -59,11 +59,9 @@ The 2026-10-21 advisory names these fixed point releases:
 .It 8.2 Ta 8.2.35
 .El
 .Pp
-PHP 7.4, 8.0 and 8.1 are end-of-life and received source-only backports rather
-than a vendor binary point release;
+PHP 7.4, 8.0 and 8.1 are end-of-life and receive no official vendor fix;
 .Nm
-reports those separately rather than naming a fixed version it cannot vouch
-for. A branch the advisory does not name is reported as
+reports those separately rather than inventing a fixed version. A branch the advisory does not name is reported as
 .Li UNKNOWN-BRANCH
 and is never guessed into patched or exposed.
 .Sh EXAMPLES
@@ -75,7 +73,7 @@ $ php2shell-remediate classify 8.4.27
 PATCHED 8.4.27
 
 $ php2shell-remediate classify 8.1.29
-EOL-BRANCH 8.1.29 \(em source-only backport, no vendor point release
+EOL-BRANCH 8.1.29 \(em end-of-life, no vendor fix; migrate to a supported branch
 .Ed
 .Sh SEE ALSO
 The project MANUAL.md for the library API

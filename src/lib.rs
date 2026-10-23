@@ -4,9 +4,9 @@
 //! DB, no network — so every branch is testable without a probe ever running.
 //!
 //! Fixed versions per the 2026-10-21 advisory: 8.5.12, 8.4.27, 8.3.36, 8.2.35.
-//! 7.4, 8.0, 8.1 are end-of-life and got source-only backports, not a vendor
-//! binary release; this tool reports that branch separately rather than
-//! inventing a fixed version number for it. Any branch not named by the
+//! 7.4, 8.0, 8.1 are end-of-life and receive no official vendor fix; this tool
+//! reports that branch separately rather than inventing a fixed version number
+//! for it. Any branch not named by the
 //! advisory is reported as unknown, never guessed into Patched or Exposed.
 
 use std::fmt;
@@ -80,9 +80,9 @@ pub enum Exposure {
     Exposed { fixed_in: PhpVersion },
     /// At or above the fixed point release on its branch.
     Patched,
-    /// 7.4 / 8.0 / 8.1 — end-of-life; the vendor shipped a source-only
-    /// backport, not a point release this tool can name as "fixed_in".
-    EolBranchSourceBackportOnly,
+    /// 7.4 / 8.0 / 8.1 — end-of-life; the advisory names no fixed release and the
+    /// vendor ships no patch for these branches.
+    EolNoVendorFix,
     /// A branch the 2026-10-21 advisory does not name. Never asserted as
     /// Patched or Exposed — an unnamed branch is unverified, not safe.
     UnknownBranch,
@@ -92,7 +92,7 @@ pub enum Exposure {
 const FIXED_PATCH_BY_BRANCH: [(u32, u32, u32); 4] =
     [(8, 5, 12), (8, 4, 27), (8, 3, 36), (8, 2, 35)];
 
-/// The end-of-life branches named in the advisory as source-backport-only.
+/// The end-of-life branches for which the advisory provides no vendor fix.
 const EOL_BRANCHES: [(u32, u32); 3] = [(7, 4), (8, 0), (8, 1)];
 
 /// Classify `observed` against the 2026-10-21 php2shell advisory.
@@ -115,7 +115,7 @@ pub fn classify_exposure(observed: &PhpVersion) -> Exposure {
     }
     for &(major, minor) in &EOL_BRANCHES {
         if observed.major == major && observed.minor == minor {
-            return Exposure::EolBranchSourceBackportOnly;
+            return Exposure::EolNoVendorFix;
         }
     }
     Exposure::UnknownBranch
@@ -199,9 +199,9 @@ pub enum RemediationPlan {
     /// No fixed binary in the repo: rebuild this point release from source
     /// (ports or vanilla source) at the fixed version, then install it.
     BuildFromSource { fixed_in: PhpVersion },
-    /// EOL branch (7.4 / 8.0 / 8.1): only a source-only backport exists; rebuild
-    /// from the backported source. There is no vendor point release to name.
-    BuildFromSourceBackport,
+    /// EOL branch (7.4 / 8.0 / 8.1): no vendor fix exists, so there is nothing to
+    /// patch in place; migrate the site to a supported, fixed branch (8.2+).
+    MigrateOffEolBranch,
     /// Already patched, or a branch the advisory does not name — nothing to
     /// apply. An unknown branch is surfaced for a human, never auto-patched.
     NoActionNeeded,
@@ -216,7 +216,7 @@ pub fn plan_remediation(exposure: Exposure, repo: PackageRepoFix) -> Remediation
             PackageRepoFix::Available => RemediationPlan::UpgradeToPointRelease { fixed_in },
             PackageRepoFix::Absent => RemediationPlan::BuildFromSource { fixed_in },
         },
-        Exposure::EolBranchSourceBackportOnly => RemediationPlan::BuildFromSourceBackport,
+        Exposure::EolNoVendorFix => RemediationPlan::MigrateOffEolBranch,
         Exposure::Patched | Exposure::UnknownBranch => RemediationPlan::NoActionNeeded,
     }
 }
