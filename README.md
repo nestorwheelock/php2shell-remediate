@@ -9,6 +9,11 @@ The classifier is a small, dependency-light Rust program with a pure decision
 core — no network, no process execution, no payload. The repository also ships a
 benevolent proof-of-concept that demonstrates the flaw by **closing** it.
 
+> **Read the whitepaper:**
+> [*php2shell, and the benevolent exploit: testing a server by securing it*](docs/php2shell-whitepaper.md)
+> — the full method, history, benevolent PoC, and disclosure ethics.
+> (All Rights Reserved; not under the code license.)
+
 ---
 
 ## Need this handled? Hire the author.
