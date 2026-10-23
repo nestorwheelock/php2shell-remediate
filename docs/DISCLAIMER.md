@@ -50,13 +50,21 @@ repeatable: **test, verify, patch, test again, verify again.**
 
 ## The tool and the published example
 
-- The `php2shell-remediate` program contains **no exploit code and no payload**.
-  It classifies a version string and reports remediation. It performs no network
-  access and executes no external process.
-- Any proof-of-concept published alongside this project demonstrates the
-  technique using a **benevolent** action (self-remediation of the flaw it rode
-  in on), not a weaponized payload. It is published to advance understanding and
-  defense, not to enable misuse.
+- The `php2shell-remediate` program itself carries **no payload**: it classifies
+  a version string and reports remediation, performing no network access and
+  running no external process.
+- The repository **does** include one proof-of-concept, in
+  `examples/benevolent-poc/`. It demonstrates the deserialization path with a
+  **benevolent** action whose only effect is to write a configuration line that
+  disables the vulnerable feature — securing the door it reaches. It is guarded
+  to act only on loopback, carries no attacker-controlled path, and runs no
+  external process. It is included so an operator can test and verify exposure on
+  a system they own by reducing it, before a vendor patch is applied.
+- Disclosure rationale: the mechanism is already derivable from the public
+  vendor fix commit, and the fixed versions are propagating across
+  distributions, so publishing a benevolent, self-limiting proof-of-concept adds
+  little to an attacker's reach while giving defenders a concrete way to verify
+  their own systems.
 
 ## Responsible use
 

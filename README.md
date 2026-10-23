@@ -2,8 +2,13 @@
 
 A small, dependency-light Rust tool that classifies a PHP point release against
 the **CVE-2026-109618 / CVE-2026-109619 ("php2shell")** advisory of 2026-10-21
-and reports what remediation the result implies. No exploit code, no payload —
-a pure decision core that answers "is this version exposed, and what closes it?"
+and reports what remediation the result implies. The classifier is a pure
+decision core — no network, no process execution — that answers "is this
+version exposed, and what closes it?" The repository also ships a **benevolent
+proof-of-concept** ([`examples/benevolent-poc/`](examples/benevolent-poc/)): a
+PoC "exploit" whose only action is to *secure* the flaw it reaches, so you can
+test and verify exposure on your own system by reducing it — before a vendor
+patch is even applied.
 
 ---
 

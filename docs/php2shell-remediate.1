@@ -16,10 +16,16 @@ CVE-2026-109618 / CVE-2026-109619
 the deserialization flaw disclosed on 2026-10-21, and reports what
 remediation the result implies.
 .Pp
-The decision core is pure: it performs no network access and no process
-execution, and contains no exploit code and no payload. It answers only the
-question
+The decision core is pure: it performs no network access, no process execution,
+and carries no payload. It answers only the question
 .Dq is this version exposed, and what closes it .
+.Pp
+The project additionally ships a benevolent proof-of-concept (the
+.Pa examples/benevolent-poc
+directory) whose only action is to disable the vulnerable feature on a system
+you own \(em a way to test and verify exposure by securing it, before a patch is
+applied. It is BSD-2-Clause licensed like the rest of the project, and is not
+part of this command.
 .Pp
 The single subcommand,
 .Cm classify ,
