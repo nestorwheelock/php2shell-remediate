@@ -1,0 +1,80 @@
+.Dd October 23, 2026
+.Dt PHP2SHELL-REMEDIATE 1
+.Os
+.Sh NAME
+.Nm php2shell-remediate
+.Nd classify a PHP point release against the php2shell advisory and report remediation
+.Sh SYNOPSIS
+.Nm
+.Cm classify
+.Ar version-string
+.Sh DESCRIPTION
+.Nm
+determines whether an observed PHP point release is exposed to
+CVE-2026-109618 / CVE-2026-109619
+.Pq Dq php2shell ,
+the deserialization flaw disclosed on 2026-10-21, and reports what
+remediation the result implies.
+.Pp
+The decision core is pure: it performs no network access and no process
+execution, and contains no exploit code and no payload. It answers only the
+question
+.Dq is this version exposed, and what closes it .
+.Pp
+The single subcommand,
+.Cm classify ,
+takes one
+.Ar version-string .
+That string may be a bare version
+.Pq Li 8.2.35 ,
+an
+.Li X-Powered-By
+header value
+.Pq Li PHP/8.2.35 ,
+or a distribution build string carrying a suffix after the patch level
+.Pq Li 8.1.29-1+deb.sury.org+1 .
+.Sh EXIT STATUS
+.Bl -tag -width 3n -compact
+.It 0
+Patched: the version is at or above the fixed point release on its branch.
+.It 1
+Not clear of the advisory: exposed, an end-of-life branch, or a branch the
+advisory does not name.
+.It 2
+Bad input: the argument could not be parsed as a three-component version.
+.El
+.Sh FIXED VERSIONS
+The 2026-10-21 advisory names these fixed point releases:
+.Bl -column "8.5" "8.5.12" -offset indent
+.It Sy Branch Ta Sy Fixed in
+.It 8.5 Ta 8.5.12
+.It 8.4 Ta 8.4.27
+.It 8.3 Ta 8.3.36
+.It 8.2 Ta 8.2.35
+.El
+.Pp
+PHP 7.4, 8.0 and 8.1 are end-of-life and received source-only backports rather
+than a vendor binary point release;
+.Nm
+reports those separately rather than naming a fixed version it cannot vouch
+for. A branch the advisory does not name is reported as
+.Li UNKNOWN-BRANCH
+and is never guessed into patched or exposed.
+.Sh EXAMPLES
+.Bd -literal -offset indent
+$ php2shell-remediate classify PHP/8.4.26
+EXPOSED 8.4.26 \(em fixed in 8.4.27
+
+$ php2shell-remediate classify 8.4.27
+PATCHED 8.4.27
+
+$ php2shell-remediate classify 8.1.29
+EOL-BRANCH 8.1.29 \(em source-only backport, no vendor point release
+.Ed
+.Sh SEE ALSO
+The project MANUAL.md for the library API
+.Pq Fn classify_exposure , Fn plan_remediation , Fn interpret_probe
+and the remediation workflow.
+.Sh STANDARDS
+Version strings are matched against the advisory table only; no inference is
+made beyond the branches the advisory names.

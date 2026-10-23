@@ -1,0 +1,20 @@
+[package]
+name = "php2shell-remediate"
+version = "0.1.0"
+edition = "2021"
+license = "BSD-2-Clause"
+description = "CVE-2026-109618/CVE-2026-109619 (php2shell) PHP exposure classifier and remediation planner. Fixed versions: 8.5.12, 8.4.27, 8.3.36, 8.2.35."
+readme = "README.md"
+keywords = ["php", "cve", "security", "remediation", "php2shell"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+
+[lib]
+name = "tools_php2shell_remediate"
+path = "src/lib.rs"
+
+[[bin]]
+name = "php2shell-remediate"
+path = "src/main.rs"
