@@ -23,9 +23,12 @@ configuration line and nothing else.
 **For educational use, against your own lab only.**
 
 - Run it only against a system you own and operate. The driver refuses to run
-  unless the target is loopback (`127.0.0.1`), and the gadget refuses to act
-  unless the request's `SERVER_ADDR` is loopback and the target path is inside
-  the document root.
+  without the `--i-own-this-system` flag and targets only `127.0.0.1`; the gadget
+  refuses to act unless you have placed an authorization sentinel file,
+  `.benevolent-poc-authorized`, in the trigger directory. On any system without
+  that file the gadget does nothing at all, even if the deserialization path is
+  reached. (A loopback-address check was tried first and rejected: inside a jail
+  or behind a proxy, `127.0.0.1` is remapped, so an address check is brittle.)
 - **Benevolent intent is not a legal defense.** Reaching into a system you do
   not own — even to fix it — is unauthorized access and can be prosecuted. If it
   is not yours, report it; do not touch it. See [../../docs/DISCLAIMER.md](../../docs/DISCLAIMER.md).
@@ -58,19 +61,40 @@ remediation.
 - `fire-benevolent.php` — the driver: plants the payload via one
   `PHP_SESSION_UPLOAD_PROGRESS` request, then reads the trigger endpoint.
 
+## Preconditions
+
+- `session.use_strict_mode = 0` (so an attacker-chosen session id is accepted)
+  and `session.upload_progress.enabled = On` — both PHP defaults.
+- `session.upload_progress.cleanup = Off` for this complete-upload form. With
+  the default `On`, PHP reaps the progress entry when the upload finishes, so
+  the payload is gone before the trigger reads it. (Defeating the default `On`
+  requires a stalled-delivery variant that holds the upload open; that is out of
+  scope for this benign demonstration.)
+- The two directory contexts with their `.user.ini` serialize-handler settings
+  described above.
+
 ## Run (own lab only)
 
-Place the two endpoints in their respective directories with the `.user.ini`
-settings above, then:
+1. Place the two endpoints in their directories with the `.user.ini` settings
+   above.
+2. **Authorize** the demonstration by creating the sentinel in the trigger
+   directory — without it the gadget no-ops:
+   ```
+   touch /path/to/trigger/.benevolent-poc-authorized
+   ```
+3. Run the driver:
+   ```
+   php fire-benevolent.php --i-own-this-system /upload/benevolent-upload.php /trigger/benevolent-trigger.php
+   ```
 
-```
-php fire-benevolent.php --i-own-this-system /upload/benevolent-upload.php /trigger/benevolent-trigger.php
-```
+On success the trigger request's destructor appends
+`session.upload_progress.enabled=0` to the `.user.ini` in the trigger directory,
+closing the feature the demonstration rode in on. Re-run `php2shell-remediate`'s
+re-verification probe afterward and the trigger path is gone.
 
-On success the trigger request's destructor writes
-`session.upload_progress.enabled=0` into a `.user.ini` in the trigger
-directory, closing the feature the demonstration rode in on. Re-run
-`php2shell-remediate`'s re-verification probe afterward and the trigger is gone.
+This has been reproduced on a FreeBSD 15 / PHP 8.4 lab: before the run the
+trigger `.user.ini` carried only the serialize-handler line; after it carried
+the containment line as well, written through the deserialization path.
 
 ## Why publish the benevolent form
 

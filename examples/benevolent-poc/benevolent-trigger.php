@@ -25,9 +25,15 @@ class UploadProgressContainment
 {
     public function __destruct()
     {
-        // Act only on the loopback lab. Off loopback, do nothing at all.
-        $addr = $_SERVER['SERVER_ADDR'] ?? '';
-        if ($addr !== '127.0.0.1' && $addr !== '::1') {
+        // Safety gate: act only when the operator has explicitly authorized
+        // this demonstration by placing an authorization sentinel in the target
+        // directory. Without that file — e.g. on any production system — this
+        // does nothing at all, even if the deserialization path is reached and
+        // the destructor runs. A sentinel is environment-independent, unlike a
+        // loopback address check: behind a reverse proxy, or inside a jail or
+        // container where 127.0.0.1 is remapped, the request address is not
+        // loopback, so an address check is both brittle and easy to get wrong.
+        if (!is_file(BENEVOLENT_TARGET_DIR . '/.benevolent-poc-authorized')) {
             return;
         }
         $ini = BENEVOLENT_TARGET_DIR . '/.user.ini';
